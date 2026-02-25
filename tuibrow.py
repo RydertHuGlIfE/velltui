@@ -3,17 +3,14 @@ import os
 import subprocess
 
 
-def browse_local_folder(start_path="/home"):
-    return curses.wrapper(_browser_local, start_path, folder_only=True)
-
-def browse_remote_folder(user, host, password, start_path="/home"):
-    return curses.wrapper(_browser_remote, user, host, password, start_path, folder_only=True)
-
 def browse_local(start_path="/home"):
     return curses.wrapper(_browser_local, start_path, False)
 
 def browse_local_folder(start_path="/home"):
     return curses.wrapper(_browser_local, start_path, True)
+
+def browse_local_any(start_path="/home"):
+    return curses.wrapper(_browser_local, start_path, False, True)
 
 def browse_remote(user, host, password, start_path="/home"):
     return curses.wrapper(_browser_remote, user, host, password, start_path, False)
@@ -21,6 +18,9 @@ def browse_remote(user, host, password, start_path="/home"):
 def browse_remote_folder(user, host, password, start_path="/home"):
     return curses.wrapper(_browser_remote, user, host, password, start_path, True)
 
+def browse_remote_any(user, host, password, start_path="/home"):
+    return curses.wrapper(_browser_remote, user, host, password, start_path, False, True)
+    
 
 def _list_local(path):
     items = ["../"]
@@ -84,7 +84,7 @@ def _draw(stdscr, items, cursor_pos, title, scroll_offset=0):
 
 # ── Local browser 
 
-def _browser_local(stdscr, start_path, folder_only=False):
+def _browser_local(stdscr, start_path, folder_only=False, any_mode=False):
     curses.curs_set(0)
     path = os.path.abspath(start_path)
     cursor_pos = 0
@@ -92,7 +92,7 @@ def _browser_local(stdscr, start_path, folder_only=False):
 
     while True:
         base_items = _list_local(path)
-        items = (["[✓ Select this folder]"] + base_items) if folder_only else base_items
+        items = (["[\u2713 Select this folder]"] + base_items) if (folder_only or any_mode) else base_items
         h, _ = stdscr.getmaxyx()
         visible_rows = h - 2
 
@@ -110,8 +110,8 @@ def _browser_local(stdscr, start_path, folder_only=False):
             cursor_pos = min(len(items) - 1, cursor_pos + 1)
         elif key in (curses.KEY_ENTER, 10, 13):
             selected = items[cursor_pos]
-            if selected == "[✓ Select this folder]":
-                return path                          # return current dir
+            if selected == "[\u2713 Select this folder]":
+                return path
             elif selected == "../":
                 path = os.path.dirname(path)
                 cursor_pos = 0
@@ -122,7 +122,7 @@ def _browser_local(stdscr, start_path, folder_only=False):
                     path = new_path
                     cursor_pos = 0
                     scroll_offset = 0
-                elif not folder_only:
+                elif not folder_only:    # any_mode or normal → pick the file
                     return new_path
         elif key == ord("q"):
             return None
@@ -130,7 +130,7 @@ def _browser_local(stdscr, start_path, folder_only=False):
 
 # ── Remote browser 
 
-def _browser_remote(stdscr, user, host, password, start_path, folder_only=False):
+def _browser_remote(stdscr, user, host, password, start_path, folder_only=False, any_mode=False):
     curses.curs_set(0)
     path = start_path
     cursor_pos = 0
@@ -138,7 +138,7 @@ def _browser_remote(stdscr, user, host, password, start_path, folder_only=False)
 
     while True:
         base_items = _list_remote(user, host, password, path)
-        items = (["[✓ Select this folder]"] + base_items) if folder_only else base_items
+        items = (["[\u2713 Select this folder]"] + base_items) if (folder_only or any_mode) else base_items
         h, _ = stdscr.getmaxyx()
         visible_rows = h - 2
 
@@ -156,8 +156,8 @@ def _browser_remote(stdscr, user, host, password, start_path, folder_only=False)
             cursor_pos = min(len(items) - 1, cursor_pos + 1)
         elif key in (curses.KEY_ENTER, 10, 13):
             selected = items[cursor_pos]
-            if selected == "[✓ Select this folder]":
-                return path                          # return current dir
+            if selected == "[\u2713 Select this folder]":
+                return path
             elif selected == "../":
                 path = "/".join(path.rstrip("/").split("/")[:-1]) or "/"
                 cursor_pos = 0
@@ -166,7 +166,7 @@ def _browser_remote(stdscr, user, host, password, start_path, folder_only=False)
                 path = path.rstrip("/") + "/" + selected.rstrip("/")
                 cursor_pos = 0
                 scroll_offset = 0
-            elif not folder_only:
+            elif not folder_only:    # any_mode or normal → pick the file
                 return path.rstrip("/") + "/" + selected
         elif key == ord("q"):
             return None

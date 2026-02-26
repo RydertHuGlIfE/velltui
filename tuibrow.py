@@ -135,10 +135,13 @@ def _browser_remote(stdscr, user, host, password, start_path, folder_only=False,
     path = start_path
     cursor_pos = 0
     scroll_offset = 0
+    dir_cache = {}     #need to cache dir otherwise need to make a new ssh connection for every single movement
 
     while True:
-        base_items = _list_remote(user, host, password, path)
-        items = (["[\u2713 Select this folder]"] + base_items) if (folder_only or any_mode) else base_items
+        if path not in dir_cache:
+            dir_cache[path] = _list_remote(user, host, password, path)
+            current_items = dir_cache[path]
+        items = (["[✓ Select this folder]"] + dir_cache[path]) if (folder_only or any_mode) else dir_cache[path]
         h, _ = stdscr.getmaxyx()
         visible_rows = h - 2
 

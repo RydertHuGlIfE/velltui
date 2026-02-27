@@ -1,7 +1,9 @@
 import ui
 import connector
 import scp_handler
+import warnings
 
+warnings.filterwarnings("ignore", category=SyntaxWarning)   #temp fix for colored printing for ui 
 
 def main():
     ui.print_ban()

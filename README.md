@@ -1,84 +1,90 @@
-# SCPCLUI
+# RSTUI (Rsync TUI)
 
 ```
-  _____________________________________ .____     ____ ___.___
- /   _____/\_   ___ \______   \_   ___ \|    |   |    |   \   |
- \_____  \ /    \  \/|     ___/    \  \/|    |   |    |   /   |
- /        \\     \___|    |   \     \___|    |___|    |  /|   |
-/_______  / \______  /____|    \______  /_______ \______/ |___|
-        \/         \/                 \/        \/
+  __________  ___________________ ____ ___ .___ 
+  \______   \/   _____/\__    ___/    |   \|   |
+   |       _/\_____  \   |    |  |    |   /|   |
+   |    |   \/        \  |    |  |    |  / |   |
+   |____|_  /_______  /  |____|  |______/  |___|
+          \/        \/                             
 ```
 
-An interactive command-line interface for SCP (Secure Copy Protocol), built in Python.
-Navigate your local and remote filesystems using a TUI file browser and transfer files or entire folders with a single command.
+An interactive, high-performance TUI for file transfers using `rsync` with `sshpass`, built in Python.
+RSTUI allows you to navigate local and remote filesystems visually and perform delta transfers with real-time progress bars.
+
+---
+
+## Why RSTUI?
+
+RSTUI uses `rsync` instead of `scp` because it is:
+-   **Faster:** Uses delta-transfer algorithms to only send parts of files that changed.
+-   **Resumable:** If a transfer is interrupted, it picks up where it left off.
+-   **Informative:** Provides real-time percentage, transfer speed, and bar indicators.
 
 ---
 
 ## Features
 
-- Interactive TUI file browser for both local and remote paths
-- Upload files or folders to a remote server
-- Download files or folders from a remote server
-- Password entered once and reused for all operations
-- Scrollable file list with scrollbar indicator
-- Select a destination folder visually without typing paths
+- **Interactive TUI file browser** for both local and remote paths.
+- **Delta-transfer support** for fast, efficient uploads and downloads.
+- **Real-time Progress Bar** (Percentage + Transfer Speed).
+- **Password entered once** and reused for the entire session.
+- **Visual Folder Selection:** Select destinations without typing long paths.
 
 ---
 
 ## Requirements
 
+### Local Machine
 - Python 3.x
-- sshpass
+- `rsync`
+- `sshpass`
 
-Install sshpass on Arch Linux:
+### Remote Machine
+- `rsync` (Required for the transfer engine to operate)
+
+### Quick Install (Arch Linux)
+```bash
+sudo pacman -S rsync sshpass
 ```
-sudo pacman -S sshpass
-```
 
----
-
-## Project Structure
-
-```
-SCPCLUI/
-  main.py         Entry point
-  connector.py    SSH connection and credential collection
-  scp_handler.py  Menu and SCP command builder
-  tuibrow.py      TUI file browser (local and remote)
-  ui.py           Banner and display utilities
+### Quick Install (Ubuntu/Debian)
+```bash
+sudo apt update && sudo apt install rsync sshpass
 ```
 
 ---
 
 ## Usage
 
-```
-python3 main.py
-```
-
-You will be prompted for:
-- Remote username
-- Remote host or IP address
-- Password (hidden input)
-
-Once connected, choose an operation:
-1. Upload - select a local file or folder, then select a remote destination folder
-2. Download - select a remote file or folder, then select a local destination folder
-3. Exit
-
-### TUI Browser Controls
-
-| Key       | Action                        |
-|-----------|-------------------------------|
-| Up / Down | Navigate the file list        |
-| Enter     | Open folder or select file    |
-| Enter on [Select this folder] | Use the current directory |
-| Q         | Cancel and quit the browser   |
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/RydertHuGlIfE/rstui.git
+    cd rstui
+    ```
+2.  Install dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
+3.  Run the application:
+    ```bash
+    python3 main.py
+    ```
 
 ---
 
-## Notes
+## Project Structure
 
-- Folder transfers use `scp -r` (recursive) automatically
-- The password is stored in memory only for the duration of the session
-- Remote browsing runs `ls -p` over SSH for each directory you navigate into
+```
+rstui/
+  main.py         Entry point and connection management
+  connector.py    SSH connection and terminal UI helpers
+  scp_handler.py  Rsync transfer logic and progress parsing
+  tuibrow.py      TUI file browser (local and remote)
+  ui.py           Branding and ASCII banner
+```
+
+---
+
+## License
+MIT

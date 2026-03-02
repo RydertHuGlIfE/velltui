@@ -14,6 +14,23 @@ RSTUI allows you to navigate local and remote filesystems visually and perform d
 
 ---
 
+## Architecture
+
+```mermaid
+graph TD
+    A[main.py] --> B[ui.py]
+    A --> C[connector.py]
+    A --> D[scp_handler.py]
+    C <--> E[(profiles.json)]
+    D --> F[tuibrow.py]
+    D --> G[Progress Bar Engine]
+    F --> H[Local FS Browser]
+    F --> I[Remote FS Browser]
+    G -.-> J{rsync + sshpass}
+```
+
+---
+
 ## Why RSTUI?
 
 RSTUI uses `rsync` instead of `scp` because it is:
@@ -26,6 +43,7 @@ RSTUI uses `rsync` instead of `scp` because it is:
 ## Features
 
 - **Interactive TUI file browser** for both local and remote paths.
+- **Profile Management:** Save frequently used server connections and load them instantly.
 - **Delta-transfer support** for fast, efficient uploads and downloads.
 - **Real-time Progress Bar** (Percentage + Transfer Speed).
 - **Password entered once** and reused for the entire session.
@@ -82,6 +100,7 @@ rstui/
   scp_handler.py  Rsync transfer logic and progress parsing
   tuibrow.py      TUI file browser (local and remote)
   ui.py           Branding and ASCII banner
+  profiles.json   Local storage for saved server connections
 ```
 
 ---

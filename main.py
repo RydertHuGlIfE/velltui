@@ -9,8 +9,6 @@ import time,sys
 spinchar = ['|', '/', '-', '\\']
 
 
-def conn_existing_profile():
-    connector.read_profiles()
 
 
 def simmenu():
@@ -21,7 +19,9 @@ def simmenu():
     choice = input("Enter your choice: [1/2/3]: ")
 
     if choice == "1":
-        print("Under progress...")
+        profile_data = connector.read_profiles()
+        if profile_data:
+            return profile_data
         return "","",""
     if choice == "2":
         user, host, password = connector.getconn()

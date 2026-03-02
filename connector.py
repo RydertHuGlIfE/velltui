@@ -19,8 +19,32 @@ def test_ssh(user, host, password):
 
 
 def read_profiles():
-    with open("profiles.json", "r") as f:
-        data = json.load(f)
-        for profile in data["profiles"]:
-            print(profile["name"])
+    try:
+        with open("profiles.json", "r") as f:
+            data = json.load(f)
+            profiles = data.get("profiles", [])
+    except (FileNotFoundError, json.JSONDecodeError):
+        print(Fore.RED + "No profiles found or file is empty." + Style.RESET_ALL)
+        return None
+
+    if not profiles:
+        print(Fore.YELLOW + "No profiles available." + Style.RESET_ALL)
+        return None
+
+    print("\n--- Available Profiles ---")
+    for idx, profile in enumerate(profiles, 1):
+        print(f"{idx}: {profile['name']} ({profile['user']}@{profile['host']})")
+
+    try:
+        choice = int(input("\nSelect profile number: "))
+        if 1 <= choice <= len(profiles):
+            p = profiles[choice - 1]
+            return p["user"], p["host"], p["password"]
+        else:
+            print(Fore.RED + "Invalid selection." + Style.RESET_ALL)
+    except ValueError:
+        print(Fore.RED + "Please enter a valid number." + Style.RESET_ALL)
+
+    return None
+        
 

@@ -29,21 +29,10 @@ graph TD
     G -.-> J{rsync + sshpass}
 ```
 
----
-
-## Why RSTUI?
-
-RSTUI uses `rsync` instead of `scp` because it is:
--   **Faster:** Uses delta-transfer algorithms to only send parts of files that changed.
--   **Resumable:** If a transfer is interrupted, it picks up where it left off.
--   **Informative:** Provides real-time percentage, transfer speed, and bar indicators.
-
----
-
 ## Features
 
 - **Interactive TUI file browser** for both local and remote paths.
-- **Profile Management:** Save frequently used server connections and load them instantly.
+- **Profile Management:** Save frequently used server connections and load them instantly, currently stored in json 
 - **Delta-transfer support** for fast, efficient uploads and downloads.
 - **Real-time Progress Bar** (Percentage + Transfer Speed).
 - **Password entered once** and reused for the entire session.
@@ -60,6 +49,7 @@ RSTUI uses `rsync` instead of `scp` because it is:
 
 ### Remote Machine
 - `rsync` (Required for the transfer engine to operate)
+
 
 ### Quick Install (Arch Linux)
 ```bash
@@ -89,6 +79,7 @@ sudo apt update && sudo apt install rsync sshpass
     python3 main.py
     ```
 
+Currently it only supports macOS and Linux distros, still researching for windows compatiblity layers
 ---
 
 ## Project Structure

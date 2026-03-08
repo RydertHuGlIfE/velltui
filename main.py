@@ -37,7 +37,7 @@ def main():
 
     conn_data = simmenu()
 
-    if conn_data == ["","",""] or conn_data is None:
+    if conn_data == ("","","") or conn_data is None:
         return
 
     user, host, password = conn_data

@@ -35,7 +35,7 @@ def _list_local(path):
 
 def _list_remote(user, host, password, path):
     # ls -p appends "/" to directories automatically
-    cmd = ["sshpass", "-p", password, "ssh", f"{user}@{host}", f"ls -p {path}"]
+    cmd = ["sshpass", "-p", password, "ssh", f"{user}@{host}", f"ls -p '{path}'"]
     out = subprocess.run(cmd, capture_output=True, text=True).stdout.strip().split("\n")
     out = [e for e in out if e and e not in (".", "..")]
     dirs  = sorted([e for e in out if e.endswith("/")])
@@ -150,7 +150,7 @@ def _browser_remote(stdscr, user, host, password, start_path, folder_only=False,
         elif cursor_pos >= scroll_offset + visible_rows:
             scroll_offset = cursor_pos - visible_rows + 1
 
-        _draw(stdscr, items, cursor_pos, f"[remote] {path}", scroll_offset)
+        _draw(stdscr, items, cursor_pos, f"[remote] '{path}'", scroll_offset)
         key = stdscr.getch()
 
         if key == curses.KEY_UP:

@@ -9,26 +9,47 @@ import getpass
 
 current_file = "Init..."
 
+def run_with_progress(cmd, password=None):
+    # If you use the SSHPASS env var fix, you'll pass password here
+    import os
+    my_env = os.environ.copy()
+    if password:
+        my_env["SSHPASS"] = password
 
-def run_with_progress(cmd):
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-    for line in process.stdout:
-        match = re.search(r'(\d+)%\s+([\d.]+\w+/s)', line)
-        if match:
-            percent = int(match.group(1))
-            speed = match.group(2)
-            display_name = current_file[:20] + "..." if len(current_file) > 20 else current_file
-            bar_filled = percent // 2
-            bar_empty = 50 - bar_filled
-            sys.stdout.write(f"\r[{'█' * bar_filled}{' ' * bar_empty}] {percent}% | {speed} | {display_name}")
-            sys.stdout.flush()
-    process.wait()
-    sys.stdout.write("\r" + " " * 70 + "\r")
-    sys.stdout.flush()
-    if process.returncode == 0:
-        print(Fore.GREEN + "Transfer Complete!" + Style.RESET_ALL)
-    else:
-        print(Fore.RED + "Transfer Failed." + Style.RESET_ALL)
+    full_output = []
+    try:
+        # We capture both stdout and stderr (STDOUT) to see the errors
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, env=my_env)
+        
+        for line in process.stdout:
+            full_output.append(line)  # Save every line to show if it fails
+            
+            # Progress bar logic
+            match = re.search(r'(\d+)%\s+([\d.]+\w+/s)', line)
+            if match:
+                percent = int(match.group(1))
+                speed = match.group(2)
+                display_name = current_file[:20] + "..." if len(current_file) > 20 else current_file
+                bar_filled = percent // 2
+                bar_empty = 50 - bar_filled
+                sys.stdout.write(f"\r[{'█' * bar_filled}{' ' * bar_empty}] {percent}% | {speed} | {display_name}")
+                sys.stdout.flush()
+        
+        process.wait()
+        sys.stdout.write("\r" + " " * 70 + "\r")
+        sys.stdout.flush()
+
+        if process.returncode == 0:
+            print(Fore.GREEN + "Transfer Complete!" + Style.RESET_ALL)
+        else:
+            print(Fore.RED + "Transfer Failed." + Style.RESET_ALL)
+            print(Fore.YELLOW + "\n--- ACTUAL ERROR FROM RSYNC ---" + Style.RESET_ALL)
+            # Print the last few lines of the output to show the error
+            print("".join(full_output[-10:])) 
+            print(Fore.YELLOW + "-------------------------------" + Style.RESET_ALL)
+
+    except Exception as e:
+        print(Fore.RED + f"\nAn unexpected Python error occurred: {e}" + Style.RESET_ALL)
 
 def smenu(user, host, password):
     global current_file
@@ -43,13 +64,15 @@ def smenu(user, host, password):
         local_path  = tuibrow.browse_local_any()
         remote_path = tuibrow.browse_remote_folder(user, host, password)
         current_file = os.path.basename(local_path)
-        cmd = ["rsync", "-avz", "--progress", "-e", f"sshpass -p {password} ssh", local_path, f"{user}@{host}:{remote_path}"]
+        escaped_remote_path = remote_path.replace("[", "\\[").replace("]", "\\]")
+        cmd = ["rsync", "-avz", "--progress", "-e", f"sshpass -p {password} ssh", local_path, f"{user}@{host}:'{remote_path}'"]
 
     elif choice == "2":
         remote_path = tuibrow.browse_remote_any(user, host, password)
         local_path  = tuibrow.browse_local_folder()
         current_file = os.path.basename(remote_path)
-        cmd = ["rsync", "-avz", "--progress", "-e", f"sshpass -p {password} ssh", f"{user}@{host}:{remote_path}", local_path]
+        escaped_remote_path = remote_path.replace("[", "\\[").replace("]", "\\]")
+        cmd = ["rsync", "-avz", "--progress", "-e", f"sshpass -p {password} ssh", f"{user}@{host}:'{remote_path}'", local_path]
 
     elif choice == "3":
         print("Add Current Profile")

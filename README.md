@@ -1,17 +1,15 @@
 # RSTUI (Rsync TUI)
 
 ```
-  __________  ___________________ ____ ___ .___ 
-  \______   \/   _____/\__    ___/    |   \|   |
-   |       _/\_____  \   |    |  |    |   /|   |
-   |    |   \/        \  |    |  |    |  / |   |
-   |____|_  /_______  /  |____|  |______/  |___|
-          \/        \/                             
+____   ____     .__  ._________________ ___.___ 
+\   \ /   /____ |  | |  \__    ___/    |   \   |
+ \   Y   // __ \|  | |  | |    |  |    |   /   |
+  \     /\  ___/|  |_|  |_|    |  |    |  /|   |
+   \___/  \___  >____/____/____|  |______/ |___|
+              \/                                   
 ```
 
-An interactive, high-performance TUI for file transfers using `rsync` with `sshpass`, built in Python.
-RSTUI allows you to navigate local and remote filesystems visually and perform delta transfers with real-time progress bars.
-
+VellTUI is currently in alpha development  starting as a high-performance Python TUI for rsync file transfers  sir. Our ultimate vision is to expand it into a complete remote server command center  integrating full system administration  process management with tools like btop  and remote execution capabilities.
 ---
 
 ## Architecture
@@ -67,8 +65,8 @@ sudo apt update && sudo apt install rsync sshpass
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/RydertHuGlIfE/rstui.git
-    cd rstui
+    git clone https://github.com/RydertHuGlIfE/velltui.git
+    cd velltui
     ```
 2.  Install dependencies:
     ```bash
@@ -85,7 +83,7 @@ Currently it only supports macOS and Linux distros, still researching for window
 ## Project Structure
 
 ```
-rstui/
+velltui/
   main.py         Entry point and connection management
   connector.py    SSH connection and terminal UI helpers
   scp_handler.py  Rsync transfer logic and progress parsing

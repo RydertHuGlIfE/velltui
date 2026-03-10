@@ -59,8 +59,9 @@ def smenu(user, host, password):
     print("2. Download")
     print("3. Add Current Profile")
     print("4. System Monitoring")
-    print("5: Exit")
-    choice = input("Enter your choice: [1/2/3/4/5]: ")
+    print("5. Remote Shell")
+    print("6: Exit")
+    choice = input("Enter your choice: [1/2/3/4/5/6]: ")
 
     if choice == "1":
         local_path  = tuibrow.browse_local_any()
@@ -107,8 +108,11 @@ def smenu(user, host, password):
         extrafet.system_monitor(user, host, password)
         return 
 
+    elif choice=="5":
+        extrafet.remote_shell(user, host, password)
+        return 
         
-    elif choice == "5":
+    elif choice == "6":
         exit()
 
     else:

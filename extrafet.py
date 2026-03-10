@@ -10,4 +10,8 @@ def system_monitor(user, host, password):
     btop_cmd = f"sshpass -p '{password}' ssh -tt -o StrictHostKeyChecking=no {user}@{host} btop"
     subprocess.run(btop_cmd, shell=True)
 
+
+def remote_shell(user, host, password):
+    shell_cmd = f"sshpass -p '{password}' ssh -tt -o StrictHostKeyChecking=no {user}@{host} zsh"
+    subprocess.run(shell_cmd, shell=True)
     

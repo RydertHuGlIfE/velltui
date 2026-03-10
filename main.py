@@ -64,7 +64,8 @@ def main():
 
     if result[0]:
         print(Fore.GREEN + "Connected!" + Style.RESET_ALL)
-        scp_handler.smenu(user, host, password)
+        while True:
+            scp_handler.smenu(user, host, password)
     else:
         print(Fore.RED + "Connection Failed." + Style.RESET_ALL)
 

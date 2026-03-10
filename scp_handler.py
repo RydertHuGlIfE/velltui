@@ -6,6 +6,7 @@ import json
 from colorama import Fore, Style
 import tuibrow
 import getpass
+import extrafet
 
 current_file = "Init..."
 
@@ -57,8 +58,9 @@ def smenu(user, host, password):
     print("1. Upload")
     print("2. Download")
     print("3. Add Current Profile")
-    print("4. Exit")
-    choice = input("Enter your choice: [1/2/3/4]: ")
+    print("4. System Monitoring")
+    print("5: Exit")
+    choice = input("Enter your choice: [1/2/3/4/5]: ")
 
     if choice == "1":
         local_path  = tuibrow.browse_local_any()
@@ -101,8 +103,12 @@ def smenu(user, host, password):
         print(Fore.GREEN + "Profile Added Successfully!" + Style.RESET_ALL)
         return 
 
+    elif choice=="4":
+        extrafet.system_monitor(user, host, password)
+        return 
+
         
-    elif choice == "4":
+    elif choice == "5":
         exit()
 
     else:

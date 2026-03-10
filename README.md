@@ -9,8 +9,7 @@ ____   ____     .__  ._________________ ___.___
               \/                                
 ```
 
-An interactive, high-performance TUI for file transfers using `rsync` with `sshpass`, built in Python.
-VELLTUI allows you to navigate local and remote filesystems visually and perform delta transfers with real-time progress bars.
+VellTUI is currently in alpha development  starting as a high-performance Python TUI for rsync file transfers  sir. Our ultimate vision is to expand it into a complete remote server command center  integrating full system administration  process management with tools like btop  and remote execution capabilities.
 ---
 
 ## Architecture

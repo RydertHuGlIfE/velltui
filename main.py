@@ -4,6 +4,7 @@ import scp_handler
 from colorama import Fore, Style
 import threading
 import time,sys
+import extrafet
 
 
 spinchar = ['|', '/', '-', '\\']

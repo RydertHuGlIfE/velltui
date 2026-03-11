@@ -82,6 +82,8 @@ sudo apt update && sudo apt install rsync sshpass
 Currently it only supports macOS and Linux distros, still researching for windows compatiblity layers
 ---
 
+Feel free to contribute to the project, I would love to make it a widely used tool....
+
 ## Project Structure
 
 ```

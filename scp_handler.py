@@ -60,7 +60,8 @@ def smenu(user, host, password):
     print("3. Add Current Profile")
     print("4. System Monitoring")
     print("5. Remote Shell")
-    print("6: Exit")
+    print("6. Check Server Logs")
+    print("7: Exit")
     choice = input("Enter your choice: [1/2/3/4/5/6]: ")
 
     if choice == "1":
@@ -111,8 +112,12 @@ def smenu(user, host, password):
     elif choice=="5":
         extrafet.remote_shell(user, host, password)
         return 
+
+    elif choice=="6":
+        extrafet.check_logs(user, host, password)
+        return 
         
-    elif choice == "6":
+    elif choice == "7":
         exit()
 
     else:

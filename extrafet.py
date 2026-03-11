@@ -31,5 +31,8 @@ def server_control(user, host, password):
         subprocess.run(shutdown_cmd, shell=True)
     if choice == "3":
         return
-        
-    
+
+
+def check_logs(user, host, password):
+    checklog_cmd = f"sshpass -p '{password}' ssh -tt -o StrictHostKeyChecking=no {user}@{host} journalctl -f"
+    subprocess.run(checklog_cmd, shell=True)

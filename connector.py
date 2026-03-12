@@ -12,8 +12,9 @@ def getconn():
     return user, host, password
 
 def test_ssh(user, host, password):
+    # -o StrictHostKeyChecking=no bypasses the "yes/no" host verification prompt
     result = subprocess.run(
-        ["sshpass", "-p", password, "ssh", f"{user}@{host}", "exit"]
+        ["sshpass", "-p", password, "ssh", "-o", "StrictHostKeyChecking=no", f"{user}@{host}", "exit"]
     )
     return result.returncode == 0
 

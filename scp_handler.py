@@ -69,13 +69,15 @@ def smenu(user, host, password):
         local_path  = tuibrow.browse_local_any()
         remote_path = tuibrow.browse_remote_folder(user, host, password)
         current_file = os.path.basename(local_path)
-        cmd = ["rsync", "-avz", "-s", "--progress", "-e", "sshpass -e ssh", local_path, f"{user}@{host}:{remote_path}"]
+        ssh_opts = "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+        cmd = ["rsync", "-avz", "-s", "--progress", "-e", f"sshpass -e ssh {ssh_opts}", local_path, f"{user}@{host}:{remote_path}"]
 
     elif choice == "2":
         remote_path = tuibrow.browse_remote_any(user, host, password)
         local_path  = tuibrow.browse_local_folder()
         current_file = os.path.basename(remote_path)
-        cmd = ["rsync", "-avz", "-s", "--progress", "-e", "sshpass -e ssh", f"{user}@{host}:{remote_path}", local_path]
+        ssh_opts = "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+        cmd = ["rsync", "-avz", "-s", "--progress", "-e", f"sshpass -e ssh {ssh_opts}", f"{user}@{host}:{remote_path}", local_path]
 
     elif choice == "3":
         print("Add Current Profile")

@@ -61,7 +61,8 @@ def smenu(user, host, password):
     print("4. System Monitoring")
     print("5. Remote Shell")
     print("6. Check Server Logs")
-    print("7: Exit")
+    print("7. Basic Server Control")
+    print("8: Exit")
     choice = input("Enter your choice: [1/2/3/4/5/6]: ")
 
     if choice == "1":
@@ -118,6 +119,10 @@ def smenu(user, host, password):
         return 
         
     elif choice == "7":
+        extrafet.server_control(user, host, password)
+        return 
+        
+    elif choice == "8":
         exit()
 
     else:

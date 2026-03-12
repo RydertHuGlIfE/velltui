@@ -1,0 +1,10 @@
+{
+    "profiles": [
+        {
+            "name": "name",
+            "user": "username",
+            "host": "192.xx.xxx.xxx",
+            "password": "passwd"
+        }
+    ]
+}

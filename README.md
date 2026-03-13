@@ -53,12 +53,12 @@ graph TD
 
 ### Quick Install (Arch Linux)
 ```bash
-sudo pacman -S rsync sshpass
+sudo pacman -S rsync sshpass zsh btop 
 ```
 
 ### Quick Install (Ubuntu/Debian)
 ```bash
-sudo apt update && sudo apt install rsync sshpass
+sudo apt update && sudo apt install rsync sshpass zsh btop
 ```
 
 ---

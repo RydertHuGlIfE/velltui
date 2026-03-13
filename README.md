@@ -9,7 +9,7 @@ ____   ____     .__  ._________________ ___.___
               \/                                
 ```
 
-VellTUI is currently in alpha development  starting as a high-performance Python TUI for rsync file transfers  sir. Our ultimate vision is to expand it into a complete remote server command center  integrating full system administration  process management with tools like btop  and remote execution capabilities.
+VellTUI is currently in alpha development  starting as a high-performance Python TUI for rsync file transfers . Our ultimate vision is to expand it into a complete remote server command center  integrating full system administration  process management with tools like btop  and remote execution capabilities.
 ---
 
 ## Architecture

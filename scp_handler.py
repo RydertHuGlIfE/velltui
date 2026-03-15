@@ -62,8 +62,9 @@ def smenu(user, host, password):
     print("5. Remote Shell")
     print("6. Check Server Logs")
     print("7. Basic Server Control")
-    print("8: Exit")
-    choice = input("Enter your choice: [1/2/3/4/5/6]: ")
+    print("8. Docker Control")
+    print("9. Exit")
+    choice = input("Enter your choice: [1/2/3/4/5/6/7/8/9]: ")
 
     if choice == "1":
         local_path  = tuibrow.browse_local_any()
@@ -125,6 +126,10 @@ def smenu(user, host, password):
         return 
         
     elif choice == "8":
+        extrafet.check_docker_container(user, host, password)
+        return
+
+    elif choice == "9":
         exit()
 
     else:

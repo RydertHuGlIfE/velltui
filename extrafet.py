@@ -53,7 +53,6 @@ def check_docker_container(user, host, password):
     imgdockpruneall = f"sshpass -p '{password}' ssh -tt -o StrictHostKeyChecking=no {user}@{host} docker image prune"
 
 
-
     
 
     print("\n Docker Control Menu...")
@@ -75,7 +74,23 @@ def check_docker_container(user, host, password):
         subprocess.run(imgdockpruneall, shell=True)
     if choice == "5":
         remote_any = tuibrow.browse_remote_any(user, host, password)
-        create_docker_image = f"sshpass -p '{password}' ssh -tt -o StrictHostKeyChecking=no {user}@{host} docker build -t {remote_any} ."
-        subprocess.run(create_docker_image, shell=True)
-    
+        if not remote_any:
+            print("No path selected.")
+            return
+
+        image_name = input("Enter Image Name (tag, e.g., my-app:v1): ").strip()
+        if not image_name:
+            image_name = "my_remote_image:latest"
+
+        if remote_any.endswith("/"):
+            build_ctx = remote_any
+            docker_cmd = f"docker build -t {image_name} {build_ctx}"
+        else:
+            parts = remote_any.rsplit("/", 1)
+            build_ctx = parts[0] + "/" if len(parts) == 2 else "."
+            docker_cmd = f"docker build -t {image_name} -f {remote_any} {build_ctx}"
+
+        create_docker_image = f"sshpass -p '{password}' ssh -tt -o StrictHostKeyChecking=no {user}@{host} '{docker_cmd}'"
+        print(Fore.YELLOW + f"Executing on remote: {docker_cmd}" + Style.RESET_ALL)
+        subprocess.run(create_docker_image, shell=True)    
 

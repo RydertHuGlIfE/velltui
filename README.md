@@ -37,7 +37,7 @@ graph TD
 - **Visual Folder Selection:** Select destinations without typing long paths.
 - **System Monitoring:** Added System Monitoring using btop, provided that btop is installed on the remote server.
 - **Remote Shell:** Added Remote Shell using zsh, provided that zsh is installed on the remote server.
-
+- **Docker Control:** Added Docker Control using commands, provided that docker is installed on the remote server.
 ---
 
 ## Requirements

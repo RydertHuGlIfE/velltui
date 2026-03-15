@@ -8,7 +8,11 @@ colorama.init(autoreset=True)
 
 def system_monitor(user, host, password):
     btop_cmd = f"sshpass -p '{password}' ssh -tt -o StrictHostKeyChecking=no {user}@{host} btop"
-    subprocess.run(btop_cmd, shell=True)
+    btop_force_utf = f"sshpass -p '{password}' ssh -tt -o StrictHostKeyChecking=no {user}@{host} btop --force-utf"
+    try:
+        subprocess.run(btop_cmd, shell=True, raise_error_on_failure=True)
+    except:
+        subprocess.run(btop_force_utf, shell=True)
 
 
 def remote_shell(user, host, password):
@@ -51,9 +55,6 @@ def check_docker_container(user, host, password):
     contdockpruneall_cmd = f"sshpass -p '{password}' ssh -tt -o StrictHostKeyChecking=no {user}@{host} docker container prune -f"
     allimgdock = f"sshpass -p '{password}' ssh -tt -o StrictHostKeyChecking=no {user}@{host} docker images"
     imgdockpruneall = f"sshpass -p '{password}' ssh -tt -o StrictHostKeyChecking=no {user}@{host} docker image prune"
-
-
-    
 
     print("\n Docker Control Menu...")
     print("1: List All Containers")

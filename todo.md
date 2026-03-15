@@ -6,5 +6,8 @@ but some folders dont show up and some do but the transfer fails on those need t
 // todo fix: priortiy - high 
 
 
-ISSUE FIXED..... 
+ISSUE FIXED.....
+
+
+todo : do messaging lmAO
 

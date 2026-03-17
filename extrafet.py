@@ -124,3 +124,15 @@ def check_docker_container(user, host, password):
         except subprocess.CalledProcessError:
             subprocess.run(create_docker_image_mac, shell=True)
 
+
+def view_files_vim(user, host, password):
+    remote_a = tuibrow.browse_remote_any(user, host, password)
+    if not remote_a:
+        print("No Path Selected... ")
+        return 
+
+    vimssh = f"sshpass -p '{password}' ssh -tt -o StrictHostKeyChecking=no {user}@{host} nvim {remote_a}"
+    subprocess.run(vimssh, shell=True)
+
+
+

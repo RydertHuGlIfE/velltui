@@ -63,8 +63,9 @@ def smenu(user, host, password):
     print("6. Check Server Logs")
     print("7. Basic Server Control")
     print("8. Docker Control")
-    print("9. Exit")
-    choice = input("Enter your choice: [1/2/3/4/5/6/7/8/9]: ")
+    print("9: Neo-vim viewer")
+    print("10. Exit")
+    choice = input("Enter your choice: [1/2/3/4/5/6/7/8/9/10]: ")
 
     if choice == "1":
         local_path  = tuibrow.browse_local_any()
@@ -130,6 +131,10 @@ def smenu(user, host, password):
         return
 
     elif choice == "9":
+        extrafet.view_files_vim(user, host, password)
+        return 
+
+    elif choice == "10":
         exit()
 
     else:

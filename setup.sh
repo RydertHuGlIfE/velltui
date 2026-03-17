@@ -4,15 +4,15 @@ echo "Setting up VELLTUI dependencies..."
 
 if [ -f /etc/arch-release ]; then
     sudo pacman -S --needed rsync sshpass python-colorama
-    sudo pacman -S --needed btop zsh
+    sudo pacman -S --needed btop zsh nvim
 elif [ -f /etc/debian_version ]; then
     sudo apt update
     sudo apt install -y rsync sshpass python3-colorama
-    sudo apt install btop zsh
+    sudo apt install btop zsh nvim
 
 elif [-f /etc/fedora_version]; then 
-    sudo dnf install -y rsync sshpass python3-colorama
-    sudo dnf install btop zsh -y
+    sudo dnf install -y rsync sshpass python3-colorama nvim
+    sudo dnf install btop zsh nvim -y
 else
     echo "Unsupported OS. Please install rsync, sshpass and colorama manually."
     exit 1

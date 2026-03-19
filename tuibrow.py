@@ -22,20 +22,25 @@ def browse_remote_any(user, host, password, start_path="/home"):
     return curses.wrapper(_browser_remote, user, host, password, start_path, False, True)
     
 
-def _list_local(path):
+def _list_local(path, show_hidden=False):
     items = ["../"]
     try:
         entries = os.listdir(path)
     except PermissionError:
         return items
+    
+    if not show_hidden:
+        entries = [e for e in entries if not e.startswith(".")]
+        
     dirs  = sorted([e + "/" for e in entries if os.path.isdir(os.path.join(path, e))])
     files = sorted([e       for e in entries if os.path.isfile(os.path.join(path, e))])
     return items + dirs + files
 
 
-def _list_remote(user, host, password, path):
+def _list_remote(user, host, password, path, show_hidden=False):
     # ls -p appends "/" to directories automatically
-    cmd = ["sshpass", "-p", password, "ssh", f"{user}@{host}", f"ls -p '{path}'"]
+    ls_cmd = "ls -pa" if show_hidden else "ls -p"
+    cmd = ["sshpass", "-p", password, "ssh", f"{user}@{host}", f"{ls_cmd} '{path}'"]
     out = subprocess.run(cmd, capture_output=True, text=True).stdout.strip().split("\n")
     out = [e for e in out if e and e not in (".", "..")]
     dirs  = sorted([e for e in out if e.endswith("/")])
@@ -43,7 +48,7 @@ def _list_remote(user, host, password, path):
     return ["../"] + dirs + files
 
 
-def _draw(stdscr, items, cursor_pos, title, scroll_offset=0):
+def _draw(stdscr, items, cursor_pos, title, scroll_offset=0, show_hidden=False):
     stdscr.clear()
     h, w = stdscr.getmaxyx()
     visible_rows = h - 2   # rows between title bar and footer
@@ -73,7 +78,8 @@ def _draw(stdscr, items, cursor_pos, title, scroll_offset=0):
         pass
 
     # Footer
-    footer = " ↑↓ Navigate | Enter Open/Select | Q Quit "
+    h_status = "ON" if show_hidden else "OFF"
+    footer = f" ↑↓ Navigate | Enter Open/Select | H Hidden ({h_status}) | Q Quit "
     try:
         stdscr.addstr(h - 1, 0, footer.center(w - 1)[:w - 1], curses.A_REVERSE)
     except curses.error:
@@ -89,9 +95,10 @@ def _browser_local(stdscr, start_path, folder_only=False, any_mode=False):
     path = os.path.abspath(start_path)
     cursor_pos = 0
     scroll_offset = 0
+    show_hidden = True
 
     while True:
-        base_items = _list_local(path)
+        base_items = _list_local(path, show_hidden)
         items = (["[\u2713 Select this folder]"] + base_items) if (folder_only or any_mode) else base_items
         h, _ = stdscr.getmaxyx()
         visible_rows = h - 2
@@ -101,7 +108,7 @@ def _browser_local(stdscr, start_path, folder_only=False, any_mode=False):
         elif cursor_pos >= scroll_offset + visible_rows:
             scroll_offset = cursor_pos - visible_rows + 1
 
-        _draw(stdscr, items, cursor_pos, path, scroll_offset)
+        _draw(stdscr, items, cursor_pos, path, scroll_offset, show_hidden)
         key = stdscr.getch()
 
         if key == curses.KEY_UP:
@@ -124,7 +131,11 @@ def _browser_local(stdscr, start_path, folder_only=False, any_mode=False):
                     scroll_offset = 0
                 elif not folder_only:    # any_mode or normal → pick the file
                     return new_path
-        elif key == ord("q"):
+        elif key in (ord("h"), ord("H"), ord(".")):
+            show_hidden = not show_hidden
+            cursor_pos = 0
+            scroll_offset = 0
+        elif key in (ord("q"), ord("Q")):
             return None
 
 
@@ -135,13 +146,14 @@ def _browser_remote(stdscr, user, host, password, start_path, folder_only=False,
     path = start_path
     cursor_pos = 0
     scroll_offset = 0
-    dir_cache = {}     #need to cache dir otherwise need to make a new ssh connection for every single movement
-
+    show_hidden = True
+    dir_cache = {}   
     while True:
-        if path not in dir_cache:
-            dir_cache[path] = _list_remote(user, host, password, path)
-            current_items = dir_cache[path]
-        items = (["[✓ Select this folder]"] + dir_cache[path]) if (folder_only or any_mode) else dir_cache[path]
+        cache_key = (path, show_hidden)
+        if cache_key not in dir_cache:
+            dir_cache[cache_key] = _list_remote(user, host, password, path, show_hidden)
+        
+        items = (["[✓ Select this folder]"] + dir_cache[cache_key]) if (folder_only or any_mode) else dir_cache[cache_key]
         h, _ = stdscr.getmaxyx()
         visible_rows = h - 2
 
@@ -150,7 +162,7 @@ def _browser_remote(stdscr, user, host, password, start_path, folder_only=False,
         elif cursor_pos >= scroll_offset + visible_rows:
             scroll_offset = cursor_pos - visible_rows + 1
 
-        _draw(stdscr, items, cursor_pos, f"[remote] '{path}'", scroll_offset)
+        _draw(stdscr, items, cursor_pos, f"[remote] '{path}'", scroll_offset, show_hidden)
         key = stdscr.getch()
 
         if key == curses.KEY_UP:
@@ -171,7 +183,11 @@ def _browser_remote(stdscr, user, host, password, start_path, folder_only=False,
                 scroll_offset = 0
             elif not folder_only:    # any_mode or normal → pick the file
                 return path.rstrip("/") + "/" + selected
-        elif key == ord("q"):
+        elif key in (ord("h"), ord("H"), ord(".")):
+            show_hidden = not show_hidden
+            cursor_pos = 0
+            scroll_offset = 0
+        elif key in (ord("q"), ord("Q")):
             return None
 
 

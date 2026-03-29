@@ -64,8 +64,10 @@ def smenu(user, host, password):
     print("7. Basic Server Control")
     print("8. Docker Control")
     print("9: Neo-vim viewer")
-    print("10. Exit")
-    choice = input("Enter your choice: [1/2/3/4/5/6/7/8/9/10]: ")
+    print("10. Disk Usage Analyzer")
+    print("11. Systemd Service Manager")
+    print("12. Exit")
+    choice = input("Enter your choice: [1/2/3/4/5/6/7/8/9/10/11/12]: ")
 
     if choice == "1":
         local_path  = tuibrow.browse_local_any()
@@ -135,6 +137,14 @@ def smenu(user, host, password):
         return 
 
     elif choice == "10":
+        extrafet.disk_usage_analyzer(user, host, password)
+        return 
+
+    elif choice == "11":
+        extrafet.systemd_manager(user, host, password)
+        return 
+
+    elif choice == "12":
         exit()
 
     else:

@@ -39,6 +39,8 @@ graph TD
 - **Remote Shell:** Added Remote Shell using zsh, provided that zsh is installed on the remote server.
 - **Docker Control:** Added Docker Control using commands, provided that docker is installed on the remote server.
 - **Neo-vim viewer:** Added Neo-vim viewer using nvim, provided that nvim is installed on the remote server.
+- **Disk Usage Analyzer:** Interactive `du`-based tool to identify large directories and drill down into the file system.
+- **Systemd Service Manager:** List active services and directly `Restart`, `Stop`, or check `Status` on the remote host.
 ---
 
 ## Requirements
@@ -93,6 +95,7 @@ velltui/
   connector.py    SSH connection and terminal UI helpers
   scp_handler.py  Rsync transfer logic and progress parsing
   tuibrow.py      TUI file browser (local and remote)
+  extrafet.py     Advanced remote management features (Docker, Systemd, Disk Analysis)
   ui.py           Branding and ASCII banner
   profiles.json   Local storage for saved server connections
 ```

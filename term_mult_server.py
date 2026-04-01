@@ -31,7 +31,7 @@ def start_server(user, host, password, socket_path):
             os.execvp("sshpass", ["sshpass", "-p", password, "ssh", "-tt", "-o", "StrictHostKeyChecking=no", f"{user}@{host}", shell])
         
         if pid > 0:
-            os.close(slave_fd)
+            os.close(slave_fd)     #we enable slave 
             while True:
                 try:
                     readable, _, _ = select.select([client, master_fd], [], [])

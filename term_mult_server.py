@@ -7,6 +7,7 @@ import time,sys
 import socket 
 import os 
 import pty
+import select
 
 socket_path = "/tmp/my_tmux.sock"
 
@@ -31,3 +32,21 @@ while True:
         os.execvp("sshpass", ["sshpass", "-p", "password", "ssh", "user@host", "zsh"])
     if pid > 0:
         os.close(slave_fd)           #close slave, let master run 
+        while True:
+            readable, _, _ = select.select([client, master_fd], [], [])
+
+            for source in readable:
+                if source == client:
+                    data = client.recv(4096)
+                    if not data:
+                        return 
+                    os.write(master_fd, data)
+                
+                elif source == master_fd:
+                    output = os.read(master_fd, 4096)
+                    if not output:
+                        print("SSH IS DEAD NO HOPE IS THERE NOW")
+                        return 
+                    client.send(output)
+
+        

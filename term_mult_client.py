@@ -5,10 +5,7 @@ import tty
 import termios
 import os
 
-# Socket Path must match your server's path
-socket_path = "/tmp/my_tmux.sock"
-
-def start_client():
+def start_client(socket_path):
     if not os.path.exists(socket_path):
         print(f"Error: Server is not running. (Socket {socket_path} not found)")
         return
@@ -24,7 +21,6 @@ def start_client():
     print("Connected to Multiplexer. (Detaching with Ctrl+C is NOT supported yet, use 'exit' in the terminal)")
 
     # 2. Set terminal to raw mode
-    # This ensures that keys like Ctrl+C are sent to the server, not handled locally.
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     try:
@@ -59,4 +55,8 @@ def start_client():
         print("\nDisconnected from Multiplexer.")
 
 if __name__ == "__main__":
-    start_client()
+    # Socket Path must match your server's path
+    socket_path = "/tmp/my_tmux.sock"
+    if len(sys.argv) > 1:
+        socket_path = sys.argv[1]
+    start_client(socket_path)

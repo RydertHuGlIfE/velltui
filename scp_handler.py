@@ -7,6 +7,7 @@ from colorama import Fore, Style
 import tuibrow
 import getpass
 import extrafet
+import time
 
 current_file = "Init..."
 
@@ -52,6 +53,24 @@ def run_with_progress(cmd, password=None):
     except Exception as e:
         print(Fore.RED + f"\nAn unexpected Python error occurred: {e}" + Style.RESET_ALL)
 
+import term_mult_client
+
+def persistent_shell(user, host, password):
+    socket_path = f"/tmp/velltui_{host}.sock"
+    if not os.path.exists(socket_path):
+        print(Fore.YELLOW + "Starting background multiplexer session..." + Style.RESET_ALL)
+        # Launch server as a detached process
+        # We use sys.executable to ensure we use the same Python interpreter/venv
+        subprocess.Popen(
+            [sys.executable, "term_mult_server.py", user, host, password, socket_path],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            preexec_fn=os.setpgrp # This detaches it from the current terminal group
+        )
+        time.sleep(1) # Wait for server to bind
+
+    term_mult_client.start_client(socket_path)
+
 def smenu(user, host, password):
     global current_file
     print("\nMenu...")
@@ -66,8 +85,9 @@ def smenu(user, host, password):
     print("9: Neo-vim viewer")
     print("10. Disk Usage Analyzer")
     print("11. Systemd Service Manager")
-    print("12. Exit")
-    choice = input("Enter your choice: [1/2/3/4/5/6/7/8/9/10/11/12]: ")
+    print("12. Persistent Shell")
+    print("13. Back to Main Menu")
+    choice = input("Enter your choice: [1..13]: ")
 
     if choice == "1":
         local_path  = tuibrow.browse_local_any()
@@ -131,7 +151,7 @@ def smenu(user, host, password):
     elif choice == "8":
         extrafet.check_docker_container(user, host, password)
         return
-
+    
     elif choice == "9":
         extrafet.view_files_vim(user, host, password)
         return 
@@ -145,7 +165,11 @@ def smenu(user, host, password):
         return 
 
     elif choice == "12":
-        exit()
+        persistent_shell(user, host, password)
+        return
+
+    elif choice == "13":
+        return "back"
 
     else:
         print("Invalid choice.")

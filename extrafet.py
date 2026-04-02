@@ -172,6 +172,7 @@ def disk_usage_analyzer(user, host, password):
         except Exception as e:
             print(Fore.RED + f"Error: {e}" + Style.RESET_ALL)
             break
+    
 
 def systemd_manager(user, host, password):
     while True:

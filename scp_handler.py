@@ -55,21 +55,72 @@ def run_with_progress(cmd, password=None):
 
 import term_mult_client
 
-def persistent_shell(user, host, password):
-    socket_path = f"/tmp/velltui_{host}.sock"
-    if not os.path.exists(socket_path):
-        print(Fore.YELLOW + "Starting background multiplexer session..." + Style.RESET_ALL)
-        # Launch server as a detached process
-        # We use sys.executable to ensure we use the same Python interpreter/venv
-        subprocess.Popen(
-            [sys.executable, "term_mult_server.py", user, host, password, socket_path],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            preexec_fn=os.setpgrp # This detaches it from the current terminal group
-        )
-        time.sleep(1) # Wait for server to bind
+def _probe_socket(path):
+    import socket as _s
+    try:
+        t = _s.socket(_s.AF_UNIX, _s.SOCK_STREAM)
+        t.settimeout(2.0)
+        t.connect(path)
+        t.close()
+        return True
+    except (ConnectionRefusedError, OSError):
+        if os.path.exists(path):
+            os.remove(path)
+        return False
 
-    term_mult_client.start_client(socket_path)
+def _launch_server(user, host, password, socket_path):
+    server_dir = os.path.dirname(os.path.abspath(__file__))
+    server_args = [sys.executable, os.path.join(server_dir, "term_mult_server.py"),
+                   user, host, password, socket_path]
+    pid = os.fork()
+    if pid == 0:
+        os.setsid()
+        pid2 = os.fork()
+        if pid2 > 0:
+            os._exit(0)
+        devnull = os.open(os.devnull, os.O_RDWR)
+        os.dup2(devnull, 0)
+        os.dup2(devnull, 1)
+        os.dup2(devnull, 2)
+        os.close(devnull)
+        os.chdir(server_dir)
+        os.execv(sys.executable, server_args)
+        os._exit(1)
+    os.waitpid(pid, 0)
+    time.sleep(1.5)
+
+def persistent_shell(user, host, password):
+    # Find all existing sessions for this host
+    import glob as _glob
+    existing = _glob.glob(f"/tmp/velltui_{host}_*.sock")
+    alive = [(p, p.replace(f"/tmp/velltui_{host}_", "").replace(".sock", ""))
+             for p in existing if _probe_socket(p)]
+
+    print(Fore.CYAN + f"\n--- Persistent Sessions for {host} ---" + Style.RESET_ALL)
+    for i, (path, name) in enumerate(alive, 1):
+        print(f"  {i}: {Fore.GREEN}{name}{Style.RESET_ALL} (alive)")
+    new_idx = len(alive) + 1
+    print(f"  {new_idx}: {Fore.YELLOW}Create New Session{Style.RESET_ALL}")
+
+    choice = input(f"Select [1-{new_idx}]: ").strip()
+    if not choice.isdigit():
+        return
+    idx = int(choice)
+
+    if 1 <= idx <= len(alive):
+        # Reconnect to existing session
+        term_mult_client.start_client(alive[idx - 1][0])
+    elif idx == new_idx:
+        name = input("Session name: ").strip().replace(" ", "_") or "default"
+        socket_path = f"/tmp/velltui_{host}_{name}.sock"
+        if _probe_socket(socket_path):
+            print(Fore.YELLOW + "Session already alive, attaching..." + Style.RESET_ALL)
+        else:
+            print(Fore.YELLOW + f"Starting session '{name}'..." + Style.RESET_ALL)
+            _launch_server(user, host, password, socket_path)
+        term_mult_client.start_client(socket_path)
+
+
 
 def smenu(user, host, password):
     global current_file
@@ -87,7 +138,7 @@ def smenu(user, host, password):
     print("11. Systemd Service Manager")
     print("12. Persistent Shell")
     print("13. Back to Main Menu")
-    choice = input("Enter your choice: [1..13]: ")
+    choice = input("Enter your choice: [1..13]: ").strip()
 
     if choice == "1":
         local_path  = tuibrow.browse_local_any()

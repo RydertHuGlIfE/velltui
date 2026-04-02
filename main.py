@@ -20,11 +20,12 @@ def list_active_sessions():
     
     print(Fore.CYAN + "\n--- Active Persistent Sessions ---" + Style.RESET_ALL)
     for idx, sock in enumerate(sockets, 1):
-        host = sock.replace("/tmp/velltui_", "").replace(".sock", "")
-        print(f"{idx}: {Fore.GREEN}{host}{Style.RESET_ALL}")
+        parts = sock.replace("/tmp/velltui_", "").replace(".sock", "").rsplit("_", 1)
+        label = f"{parts[0]}  [{parts[1]}]" if len(parts) == 2 else parts[0]
+        print(f"{idx}: {Fore.GREEN}{label}{Style.RESET_ALL}")
     
     print(f"{len(sockets)+1}: Back to Main Menu")
-    choice = input(f"Select session to resume [1-{len(sockets)+1}]: ")
+    choice = input(f"Select session to resume [1-{len(sockets)+1}]: ").strip()
     
     if choice.isdigit():
         idx = int(choice)

@@ -10,7 +10,7 @@ def start_client(socket_path):
         print(f"Error: Server is not running. (Socket {socket_path} not found)")
         return
 
-    # 1. Connect to the Server
+    # 1. serv connect 
     client_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     try:
         client_sock.connect(socket_path)
@@ -20,14 +20,14 @@ def start_client(socket_path):
 
     print("Connected to Multiplexer. (Detaching with Ctrl+C is NOT supported yet, use 'exit' in the terminal)")
 
-    # 2. Set terminal to raw mode
+    # 2. Set terminal to raw mode   meaning no line buffering 
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     try:
         tty.setraw(fd)
         
         while True:
-            # 3. Multiplex I/O between Stdin and Socket
+            # 3. Multiplex I/O 
             readable, _, _ = select.select([sys.stdin, client_sock], [], [])
 
             for source in readable:
@@ -48,9 +48,9 @@ def start_client(socket_path):
                     sys.stdout.flush()
 
     except Exception as e:
-        pass # Handle exit gracefully
+        pass # gracefull exit FAAAAH
     finally:
-        # 4. Restore terminal settings on exit
+        # restore og settings i think
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         print("\nDisconnected from Multiplexer.")
 

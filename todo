@@ -1,0 +1,14 @@
+ Persistent Shell
+13. Back to Main Menu
+Enter your choice: [1..13]: 12
+Error connecting to server: [Errno 111] Connection refused
+
+Menu...
+1. Upload
+2. Download
+3. Add Current Profile
+4. System Monitoring
+5. Remote Shell
+6. Check Server Logs
+7. Basic Server Control
+8. Docker Control

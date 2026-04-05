@@ -50,7 +50,7 @@ def start_client(socket_path):
     except Exception as e:
         pass # gracefull exit FAAAAH
     finally:
-        # restore og settings i think
+        # restore og settings i think        
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         print("\nDisconnected from Multiplexer.")
 

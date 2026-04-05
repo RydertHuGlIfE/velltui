@@ -140,34 +140,42 @@ def disk_usage_analyzer(user, host, password):
     current_path = "/"
     while True:
         print(Fore.CYAN + f"\n Analyzing Disk Usage at: {current_path}" + Style.RESET_ALL)
+        # Fix: Ensure closing quote and add 2>/dev/null | sort -hr
         cmd = f"sshpass -p '{password}' ssh -o StrictHostKeyChecking=no {user}@{host} \"du -h --max-depth=1 {current_path} 2>/dev/null | sort -hr\""
         
         try:
-            result = subprocess.check_output(cmd, shell=True, text=True)
-            lines = result.strip().split('\n')
+            # Fix: Use subprocess.run with capture_output to handle non-zero exit codes (like permission denied)
+            result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            output = result.stdout
+            lines = output.strip().split('\n')
             
             options = []
-            for i, line in enumerate(lines):
+            valid_lines = 0
+            for line in lines:
                 parts = line.split('\t')
                 if len(parts) == 2:
                     size, path = parts
                     options.append(path)
-                    print(f"{i+1}: {Fore.YELLOW}{size}{Style.RESET_ALL} \t {path}")
+                    valid_lines += 1
+                    print(f"{valid_lines}: {Fore.YELLOW}{size}{Style.RESET_ALL} \t {path}")
             
-            print(f"{len(lines)+1}: Go Up")
-            print(f"{len(lines)+2}: Exit Analyzer")
+            if not options:
+                print(Fore.RED + "No data found or permission denied." + Style.RESET_ALL)
+                
+            print(f"{len(options)+1}: Go Up")
+            print(f"{len(options)+2}: Exit Analyzer")
             
-            choice = input(f"Select a directory to drill down [1-{len(lines)+2}]: ")
+            choice = input(f"Select a directory to drill down [1-{len(options)+2}]: ")
             
             if not choice.isdigit():
                 continue
                 
             idx = int(choice)
-            if 1 <= idx <= len(lines):
+            if 1 <= idx <= len(options):
                 current_path = options[idx-1]
-            elif idx == len(lines) + 1:
+            elif idx == len(options) + 1:
                 current_path = "/".join(current_path.rstrip("/").split("/")[:-1]) or "/"
-            elif idx == len(lines) + 2:
+            elif idx == len(options) + 2:
                 break
         except Exception as e:
             print(Fore.RED + f"Error: {e}" + Style.RESET_ALL)
